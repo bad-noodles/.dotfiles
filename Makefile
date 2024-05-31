@@ -1,2 +1,2 @@
 apply:
-	stow --target=$HOME .
+	stow --target=$$HOME .
