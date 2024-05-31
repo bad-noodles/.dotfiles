@@ -1,0 +1,2 @@
+apply:
+	stow --target=$HOME .
