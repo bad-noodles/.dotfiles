@@ -1,0 +1,7 @@
+tap "git"
+tap "neovim"
+tap "docker"
+tap "golang"
+tap "hammerspoon"
+cask "wezterm"
+cask "brave"
