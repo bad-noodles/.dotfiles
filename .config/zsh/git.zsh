@@ -1,0 +1,5 @@
+alias add="git add"
+alias commit="git commit"
+alias push="git push"
+alias clone="git clone"
+alias status="git status"

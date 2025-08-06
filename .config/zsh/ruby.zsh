@@ -1,1 +1,1 @@
-eval "$(~/.local/bin/mise activate)"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
