@@ -1,5 +1,0 @@
-alias v="nvim"
-alias vn="v ~/.config/nvim/lua/"
-alias vw="v ~/.config/wezterm/wezterm.lua"
-alias vz="v ~/.zshrc"
-alias vc="v ~/.config"
