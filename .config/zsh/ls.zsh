@@ -1,1 +1,6 @@
-alias la="ls -la"
+alias ls="ls -a"
+alias ll="ls -la"
+
+chpwd() {
+  ls
+}

@@ -1,4 +1,5 @@
 brew "git"
+brew "stow"
 brew "zoxide"
 brew "fzf"
 brew "bat"

@@ -34,7 +34,6 @@ if ! zgenom saved; then
 
   zgenom load zpm-zsh/colors
   zgenom load zpm-zsh/colorize
-  zgenom load aikow/zsh-auto-ls
 
   # generate the init script from plugins above
   zgenom save
