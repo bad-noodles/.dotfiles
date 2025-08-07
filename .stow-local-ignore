@@ -2,4 +2,6 @@
 .gitignore
 Makefile
 .DS_Store
-apply.sh
+README.md
+Brewfile
+apply.zsh
