@@ -14,6 +14,7 @@ zgenom autoupdate
 
 function reload() {
   zgenom reset
+  # TODO: make sure it updates in the same session
   source ~/.zshrc
 }
 
