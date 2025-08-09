@@ -1,7 +1,10 @@
 #!/bin/env zsh
 
-# Install Homebrew and deps
+echo "===   Installing Homebrew   ==="
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+/opt/homebrew/bin/brew shellenv
+
+echo "===   Installing Brew Dependencies   ==="
 brew bundle
 
 # Download dotfiles
@@ -13,3 +16,6 @@ git clone https://github.com/jandamm/zgenom.git "${HOME}/.config/zgenom"
 mv .zprofile .zprofile_bkp
 cd ./dotfiles
 stow --target=$HOME .
+
+# Triggers the zgenom package manager to update dependencies
+reload

@@ -12,4 +12,7 @@ fi
 # ------------
 source "/opt/homebrew/opt/fzf/shell/key-bindings.zsh"
 
+# Fix unwanted key bindings
+bindkey -M vicmd '^R' redo
+
 alias fzf="fzf --preview 'bat --color=always {}' --preview-window '~3'"
