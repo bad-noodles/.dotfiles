@@ -1,6 +1,6 @@
 #!/bin/env zsh
 
-clear
+echo ""
 echo "======================================="
 echo "===   Installing Homebrew and Git   ==="
 echo "======================================="
@@ -10,7 +10,7 @@ echo ""
 eval "$(/opt/homebrew/bin/brew shellenv)"
 brew install git
 
-clear
+echo ""
 echo "================================"
 echo "===   Downloading dotfiles   ==="
 echo "================================"
@@ -20,7 +20,7 @@ cd ~
 git clone https://github.com/bad-noodles/.dotfiles.git
 cd .dotfiles
 
-clear
+echo ""
 echo "========================================"
 echo "===   Installing Brew Dependencies   ==="
 echo "========================================"
@@ -28,7 +28,7 @@ echo ""
 
 brew bundle
 
-clear
+echo ""
 echo "========================================="
 echo "===   Creating symlinks to dotfiles   ==="
 echo "====                                 ===="
@@ -43,7 +43,7 @@ mv ~/.zprofile ~/.zprofile_bkp
 mv ~/.zshrc ~/.zshrc_bkp
 stow --target=$HOME .
 
-clear
+echo ""
 echo "=========================================="
 echo "===   Downloading zsh plugin manager   ==="
 echo "=========================================="
@@ -52,7 +52,7 @@ echo ""
 git clone https://github.com/jandamm/zgenom.git ".config/zgenom"
 
 
-clear
+echo ""
 echo "=================================="
 echo "===   Installing zsh plugins   ==="
 echo "=================================="
@@ -60,7 +60,8 @@ echo ""
 
 reload
 
-clear
+echo ""
 echo "====================="
 echo "===   All done!   ==="
 echo "====================="
+echo ""
