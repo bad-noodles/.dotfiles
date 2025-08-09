@@ -58,7 +58,7 @@ echo "===   Installing zsh plugins   ==="
 echo "=================================="
 echo ""
 
-reload
+source .zshrc
 
 echo ""
 echo "====================="
