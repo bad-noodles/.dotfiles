@@ -1,21 +1,59 @@
 #!/bin/env zsh
 
-echo "===   Installing Homebrew   ==="
+echo "======================================="
+echo "===   Installing Homebrew and Git   ==="
+echo "======================================="
+echo ""
+
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 eval "$(/opt/homebrew/bin/brew shellenv)"
+brew install git
 
-echo "===   Installing Brew Dependencies   ==="
-brew bundle
+echo "================================"
+echo "===   Downloading dotfiles   ==="
+echo "================================"
+echo ""
 
-# Download dotfiles
 cd ~
 git clone git@github.com:bad-noodles/.dotfiles.git
-git clone https://github.com/jandamm/zgenom.git "${HOME}/.config/zgenom"
+cd .dotfiles
 
-# Backup existing config and apply
-mv .zprofile .zprofile_bkp
-cd ./dotfiles
+echo "========================================"
+echo "===   Installing Brew Dependencies   ==="
+echo "========================================"
+echo ""
+
+brew bundle
+
+echo "========================================="
+echo "===   Creating symlinks to dotfiles   ==="
+echo "====                                 ===="
+echo "====     .zprofile and .zshrc files  ===="
+echo "====     will be backed up in the    ===="
+echo "====     same directory if they      ===="
+echo "====     already exist               ===="
+echo "========================================="
+echo ""
+
+mv ~/.zprofile ~/.zprofile_bkp
+mv ~/.zshrc ~/.zshrc_bkp
 stow --target=$HOME .
 
-# Triggers the zgenom package manager to update dependencies
+echo "=========================================="
+echo "===   Downloading zsh plugin manager   ==="
+echo "=========================================="
+echo ""
+
+git clone https://github.com/jandamm/zgenom.git ".config/zgenom"
+
+
+echo "=================================="
+echo "===   Installing zsh plugins   ==="
+echo "=================================="
+echo ""
+
 reload
+
+echo "====================="
+echo "===   All done!   ==="
+echo "====================="
