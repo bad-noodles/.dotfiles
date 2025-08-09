@@ -1,5 +1,8 @@
 #!/bin/env zsh
 
+# Stop execution if any command fails
+set -eo pipefail
+
 echo ""
 echo "======================================="
 echo "===   Installing Homebrew and Git   ==="
@@ -60,10 +63,3 @@ echo ""
 
 open /Applications/WezTerm.app
 
-echo ""
-echo "====================="
-echo "===   All done!   ==="
-echo "====================="
-echo ""
-
-exit
