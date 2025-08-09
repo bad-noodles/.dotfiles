@@ -53,15 +53,17 @@ git clone https://github.com/jandamm/zgenom.git ".config/zgenom"
 
 
 echo ""
-echo "=================================="
-echo "===   Installing zsh plugins   ==="
-echo "=================================="
+echo "===================================================="
+echo "===   Zsh plugins will be installed in WezTerm   ==="
+echo "===================================================="
 echo ""
 
-source .zshrc
+open /Applications/WezTerm.app
 
 echo ""
 echo "====================="
 echo "===   All done!   ==="
 echo "====================="
 echo ""
+
+exit
