@@ -34,16 +34,9 @@ brew bundle
 echo ""
 echo "========================================="
 echo "===   Creating symlinks to dotfiles   ==="
-echo "====                                 ===="
-echo "====     .zprofile and .zshrc files  ===="
-echo "====     will be backed up in the    ===="
-echo "====     same directory if they      ===="
-echo "====     already exist               ===="
 echo "========================================="
 echo ""
 
-mv ~/.zprofile ~/.zprofile_bkp
-mv ~/.zshrc ~/.zshrc_bkp
 stow --target=$HOME .
 
 echo ""
