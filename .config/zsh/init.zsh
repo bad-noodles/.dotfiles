@@ -2,6 +2,7 @@ source ~/.config/zgenom/zgenom.zsh
 
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH
 export XDG_CONFIG_HOME="$HOME/.config"
+export EDITOR="v"
 
 eval "$(zoxide init zsh)"
 eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/theme.omp.json)"
@@ -26,6 +27,7 @@ if ! zgenom saved; then
   zgenom load zpm-zsh/colorize
   zgenom load zsh-users/zsh-syntax-highlighting
   zgenom load zsh-users/zsh-history-substring-search
+  zgenom load hlissner/zsh-autopair
   zgenom load zsh-users/zsh-autosuggestions
   zgenom load gmatheu/shell-plugins explain-shell
 
