@@ -39,6 +39,10 @@ config.keys = {
 	-- Tab navigation
 	{ key = "h", mods = "CMD|SHIFT", action = wezterm.action.ActivateTabRelative(-1) },
 	{ key = "l", mods = "CMD|SHIFT", action = wezterm.action.ActivateTabRelative(1) },
+  -- Panes
+	{ key = "|", mods = "CMD|SHIFT", action = wezterm.action.SplitHorizontal({domain="CurrentPaneDomain"}) },
+	{ key = "-", mods = "CMD|SHIFT", action = wezterm.action.SplitVertical({domain="CurrentPaneDomain"}) },
+	{ key = "w", mods = "CMD|SHIFT", action = wezterm.action.CloseCurrentPane() },
 }
 
 return config

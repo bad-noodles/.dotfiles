@@ -1,6 +1,7 @@
 source ~/.config/zgenom/zgenom.zsh
 
 export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH
+export XDG_CONFIG_HOME="$HOME/.config"
 
 eval "$(zoxide init zsh)"
 eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/theme.omp.json)"
@@ -37,11 +38,13 @@ if ! zgenom saved; then
   zgenom load ~/.config/zsh/git.zsh
   zgenom load ~/.config/zsh/brew.zsh
   zgenom load ~/.config/zsh/ffmpeg.zsh
+  zgenom load ~/.config/zsh/hear.zsh
 
 
   zgenom load ~/.config/zsh/go.zsh
   zgenom load ~/.config/zsh/python.zsh
   zgenom load ~/.config/zsh/java.zsh
+  zgenom load ~/.config/zsh/javascript.zsh
   zgenom load ~/.config/zsh/android.zsh
   zgenom load ~/.config/zsh/ruby.zsh
 

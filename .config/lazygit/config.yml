@@ -1,0 +1,11 @@
+git:
+  commitPrefix:
+    - pattern: '^feat/(\w+-\d+).*'
+      replace: 'feat($1): ✨ '
+    - pattern: '^fix/(\w+-\d+).*'
+      replace: 'fix($1): 🐛 '
+    - pattern: '^test/(\w+-\d+).*'
+      replace: 'test($1): 🧪 '
+    - pattern: '^chore/(\w+-\d+).*'
+      replace: 'chore($1): 🔧 '
+
