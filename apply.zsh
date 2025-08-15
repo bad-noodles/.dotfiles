@@ -1,4 +1,4 @@
-#!/bin/env zsh
+#!/bin/zsh
 
 # Stop execution if any command fails
 set -eo pipefail
@@ -85,6 +85,23 @@ print_divider() {
     echo -e "${PURPLE}${BOLD}$(printf '═%.0s' {1..80})${NC}"
     echo ""
 }
+
+clear
+echo ""
+echo -e "${CYAN}${BOLD}╔═════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}${BOLD}║${NC}                                                                     ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}    ${PURPLE}${BOLD}██████╗  ██████╗ ████████╗███████╗██╗██╗     ███████╗███████╗${NC}    ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}    ${PURPLE}${BOLD}██╔══██╗██╔═══██╗╚══██╔══╝██╔════╝██║██║     ██╔════╝██╔════╝${NC}    ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}    ${PURPLE}${BOLD}██║  ██║██║   ██║   ██║   █████╗  ██║██║     █████╗  ███████╗${NC}    ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}    ${PURPLE}${BOLD}██║  ██║██║   ██║   ██║   ██╔══╝  ██║██║     ██╔══╝  ╚════██║${NC}    ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}    ${PURPLE}${BOLD}██████╔╝╚██████╔╝   ██║   ██║     ██║███████╗███████╗███████║${NC}    ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}    ${PURPLE}${BOLD}╚═════╝  ╚═════╝    ╚═╝   ╚═╝     ╚═╝╚══════╝╚══════╝╚══════╝${NC}    ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}║${NC}                                                                     ${CYAN}${BOLD}║${NC}"
+echo -e "${CYAN}${BOLD}╚═════════════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo -e "${WHITE}${BOLD}                     Press ENTER to begin setup...${NC}"
+read -r
+
 
 # Start of main script
 print_header "🍺 Installing Homebrew and Git"
