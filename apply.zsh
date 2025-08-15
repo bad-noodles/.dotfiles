@@ -37,7 +37,7 @@ print_step() {
     local content="🚀 Step ${step_num}: ${description}"
     local content_len=${#content}
     local width=80
-    local right_padding=$((width - content_len - 3))
+    local right_padding=$((width - content_len - 5))
     
     echo -e "${PURPLE}${BOLD}╭─────────────────────────────────────────────────────────────────────────────╮${NC}"
     echo -e "${PURPLE}${BOLD}│${NC} ${YELLOW}${BOLD}🚀 Step ${step_num}:${NC} ${WHITE}${description}${NC}$(printf "%*s" $right_padding "")${PURPLE}${BOLD}│${NC}"
