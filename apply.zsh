@@ -21,7 +21,7 @@ print_header() {
     local title_len=${#title}
     local padding=$(((width - title_len - 4) / 2))
     local left_padding=$(printf "%*s" $padding "")
-    local right_padding=$(printf "%*s" $((width - title_len - 4 - padding)) "")
+    local right_padding=$(printf "%*s" $((width - title_len - 3 - padding)) "")
     
     echo ""
     echo -e "${CYAN}${BOLD}┌$(printf '─%.0s' {1..$((width-2))})┐${NC}"
@@ -34,8 +34,13 @@ print_header() {
 print_step() {
     local step_num="$1"
     local description="$2"
+    local content="🚀 Step ${step_num}: ${description}"
+    local content_len=${#content}
+    local width=80
+    local right_padding=$((width - content_len - 3))
+    
     echo -e "${PURPLE}${BOLD}╭─────────────────────────────────────────────────────────────────────────────╮${NC}"
-    echo -e "${PURPLE}${BOLD}│${NC} ${YELLOW}${BOLD}🚀 Step ${step_num}:${NC} ${WHITE}${description}${PURPLE}${BOLD} │${NC}"
+    echo -e "${PURPLE}${BOLD}│${NC} ${YELLOW}${BOLD}🚀 Step ${step_num}:${NC} ${WHITE}${description}${NC}$(printf "%*s" $right_padding "")${PURPLE}${BOLD}│${NC}"
     echo -e "${PURPLE}${BOLD}╰─────────────────────────────────────────────────────────────────────────────╯${NC}"
     echo ""
 }
@@ -64,7 +69,7 @@ print_progress() {
     local filled=$((current * width / total))
     local empty=$((width - filled))
     
-    printf "\r${CYAN}${BOLD}Progress: [${NC}"
+    printf "\r${CYAN}${BOLD}Overall Progress: [${NC}"
     printf "${GREEN}%*s${NC}" $filled "" | tr ' ' '█'
     printf "${WHITE}%*s${NC}" $empty "" | tr ' ' '░'
     printf "${CYAN}${BOLD}] ${percentage}%% (${current}/${total})${NC}"
