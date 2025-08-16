@@ -55,17 +55,17 @@ git_status() {
   local branch=$(git branch | sed "s/\* //")
   local staged=$(git diff --cached --numstat | wc -l | awk '{print $1}')
   local changes=$(git --no-pager diff --shortstat | cut -c 2)
-  local untracked=$(git ls-files --others | wc -l | awk '{print $1}')
+  local untracked=$(git ls-files --others --exclude-standard | wc -l | awk '{print $1}')
   local origin=$(cat .git/FETCH_HEAD | egrep -o ":.*$" | cut -c 2-)
 
   local output=' '
   output+=$origin
   output+=$'  '
   output+=$branch
-  output+='  '
-  output+=$changes
   output+='  '
   output+=$staged
+  output+='  '
+  output+=$changes
   output+='  '
   output+=$untracked
 
@@ -109,25 +109,12 @@ clock() {
   block $PINK " $(date "+%H:%M:%S")"
 }
 
-export LATENT_PROMPT=""
-
-prompt_prerender() {
+precmd() {
   last_exit_code=$?
   first_block=true
-  LATENT_PROMPT="$(clock)"
+  PROMPT="$(clock)"
   first_block=false
-  # LATENT_PROMPT+="$(user)$(hostname)$(cwd)$(git_status)$(exit_code $last_exit_code)$(end_line)"
-  LATENT_PROMPT+="$(user)$(git_status)$(exit_code $last_exit_code)$(end_line)"
-  LATENT_PROMPT+=$'\u000a' #LINE BREAK
-  first_block=true
-  LATENT_PROMPT+="{vi_mode}$(end_line) "
-}
-
-prompt_render() {
-  PROMPT=${LATENT_PROMPT/{vi_mode}/$(vi_mode)}
-}
-
-precmd() {
-  prompt_prerender
-  prompt_render
+  PROMPT+="$(user)$(hostname)$(cwd)$(git_status)$(exit_code $last_exit_code)$(end_line)"
+  PROMPT+=$'\u000a' #LINE BREAK
+  PROMPT+="  "
 }

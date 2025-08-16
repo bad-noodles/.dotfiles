@@ -4,9 +4,6 @@ export PATH=$HOME/.local/bin:$HOME/bin:/usr/local/bin:$PATH
 export XDG_CONFIG_HOME="$HOME/.config"
 export EDITOR="v"
 
-eval "$(zoxide init zsh)"
-# eval "$(oh-my-posh init zsh --config ~/.config/oh-my-posh/theme.omp.json)"
-
 setopt auto_cd
 setopt NO_BEEP
 autoload compinit
@@ -38,12 +35,12 @@ if ! zgenom saved; then
   zgenom load ~/.config/zsh/history-substring-search.zsh
   zgenom load ~/.config/zsh/fzf.zsh
   zgenom load ~/.config/zsh/nvim.zsh
-  zgenom load ~/.config/zsh/vimode.zsh
   zgenom load ~/.config/zsh/git.zsh
   zgenom load ~/.config/zsh/brew.zsh
   zgenom load ~/.config/zsh/ffmpeg.zsh
   zgenom load ~/.config/zsh/hear.zsh
   zgenom load ~/.config/zsh/prompt.zsh
+  zgenom load ~/.config/zsh/zoxide.zsh
 
 
   zgenom load ~/.config/zsh/go.zsh
