@@ -47,8 +47,8 @@ git_status() {
   if [ ! -d ".git" ]; then
     return
   fi
-  local branch=$(git branch | sed "s/\* //")
-  local commits=$(git cherry | wc -l | awk '{print $1}')
+  local branch=$(git --no-pager branch | grep "\* .*$" | sed "s/\* //")
+  local commits=$(git cherry 2> /dev/null | wc -l | awk '{print $1}')
   local staged=$(git diff --cached --numstat | wc -l | awk '{print $1}')
   local changes=$(git --no-pager diff --shortstat | cut -c 2)
   local untracked=$(git ls-files --others --exclude-standard | wc -l | awk '{print $1}')
