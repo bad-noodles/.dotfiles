@@ -1,5 +1,4 @@
 setopt prompt_subst
-export LANG=C.UTF-16
 
 PURPLE=129
 PINK=201
@@ -8,9 +7,6 @@ BLUE=27
 RED=203
 GREEN=40
 LIGHT_PINK=171
-LEFT_HALF_CIRCLE=$'\ue0b6'
-RIGHT_HALF_CIRCLE=$'\ue0b4'
-ARROW_RIGHT=$'\ue0b0'
 
 block() {
   local color=$1
@@ -20,11 +16,10 @@ block() {
 
   if $first_block; then
     output+=$(tput setaf $color)
-    output+=$LEFT_HALF_CIRCLE
+    output+=''  
   else
     output+=$(tput setab $color)
-    output+=$RIGHT_HALF_CIRCLE
-    output+=' '
+    output+=' '
   fi
 
   output+=$(tput sgr0)
@@ -85,7 +80,7 @@ function exit_code() {
 }
 
 end_line() {
-  output=$RIGHT_HALF_CIRCLE
+  output=''
   output+=$(tput sgr0)
   echo $output
 }

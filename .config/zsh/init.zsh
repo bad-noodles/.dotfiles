@@ -12,6 +12,8 @@ _comp_options+=(globdots)
 zstyle ':completion:*:default' menu yes select
 
 bindkey -v
+
+eval "$(zoxide init zsh --cmd cd)"
 zgenom autoupdate
 
 function reload() {
@@ -32,6 +34,7 @@ if ! zgenom saved; then
 
   zgenom load ~/.config/zsh/env.zsh
   zgenom load ~/.config/zsh/ls.zsh
+  zgenom load ~/.config/zsh/clipboard.zsh
   zgenom load ~/.config/zsh/history-substring-search.zsh
   zgenom load ~/.config/zsh/fzf.zsh
   zgenom load ~/.config/zsh/nvim.zsh
@@ -40,8 +43,6 @@ if ! zgenom saved; then
   zgenom load ~/.config/zsh/ffmpeg.zsh
   zgenom load ~/.config/zsh/hear.zsh
   zgenom load ~/.config/zsh/prompt.zsh
-  zgenom load ~/.config/zsh/zoxide.zsh
-
 
   zgenom load ~/.config/zsh/go.zsh
   zgenom load ~/.config/zsh/python.zsh
