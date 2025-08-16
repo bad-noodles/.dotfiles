@@ -52,7 +52,7 @@ git_status() {
   local staged=$(git diff --cached --numstat | wc -l | awk '{print $1}')
   local changes=$(git --no-pager diff --shortstat | cut -c 2)
   local untracked=$(git ls-files --others --exclude-standard | wc -l | awk '{print $1}')
-  local origin=$(cat .git/FETCH_HEAD | egrep -o ":.*$" | cut -c 2-)
+  local origin=$(cat .git/FETCH_HEAD | egrep -o -m 1 ":.*$" | cut -c 2-)
 
   local output=' '
   output+=$origin
