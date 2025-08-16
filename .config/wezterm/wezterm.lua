@@ -42,7 +42,6 @@ config.keys = {
   -- Panes
 	{ key = "|", mods = "CMD|SHIFT", action = wezterm.action.SplitHorizontal({domain="CurrentPaneDomain"}) },
 	{ key = "-", mods = "CMD|SHIFT", action = wezterm.action.SplitVertical({domain="CurrentPaneDomain"}) },
-	{ key = "w", mods = "CMD|SHIFT", action = wezterm.action.CloseCurrentPane() },
 }
 
 return config
