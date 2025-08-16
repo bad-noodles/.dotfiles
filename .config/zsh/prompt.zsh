@@ -53,6 +53,7 @@ git_status() {
     return
   fi
   local branch=$(git branch | sed "s/\* //")
+  local commits=$(git cherry | wc -l | awk '{print $1}')
   local staged=$(git diff --cached --numstat | wc -l | awk '{print $1}')
   local changes=$(git --no-pager diff --shortstat | cut -c 2)
   local untracked=$(git ls-files --others --exclude-standard | wc -l | awk '{print $1}')
@@ -60,8 +61,10 @@ git_status() {
 
   local output=' '
   output+=$origin
-  output+=$'  '
+  output+='  '
   output+=$branch
+  output+='  '
+  output+=$commits
   output+='  '
   output+=$staged
   output+='  '
