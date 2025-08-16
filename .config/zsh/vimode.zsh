@@ -1,8 +1,32 @@
 bindkey -v
 
+COLOR_NORMAL=69
+COLOR_INSERT=205
+COLOR_VISUAL=141
+COLOR_REPLACE=198
+
+call_widget() {
+  local func=$1
+  shift
+
+  zle "$@" && shift 2 && $func "$@"
+}
+
+hook_widget() {
+  # The name of the widget to create/decorate.
+  local widget=$1
+  # The name of the OMP function.
+  local func=$2
+
+  # Back up the original widget. The leading dot in widget name is to work around bugs when used with zsh-syntax-highlighting in Zsh v5.8 or lower.
+  zle -A $widget ._original::$widget
+  eval "_decorated_${(q)widget}() { call_widget ${(q)func} ._original::${(q)widget} -- \"\$@\" }"
+  zle -N $widget _decorated_$widget
+}
+
 redraw-prompt() {
-  _omp_precmd
-  zle .reset-prompt
+  prompt_render
+  zle reset-prompt
 }
 
 vimode-cmd() {
@@ -32,35 +56,35 @@ vimode-replace() {
 
 
 # CMD/Normal mode
-_omp_create_widget vi-cmd-mode vimode-cmd
-_omp_create_widget deactivate-region vimode-cmd
+hook_widget vi-cmd-mode vimode-cmd
+hook_widget deactivate-region vimode-cmd
 
 # Insert mode
-_omp_create_widget vi-insert vimode-insert
-_omp_create_widget vi-insert-bol vimode-insert
-_omp_create_widget vi-add-eol vimode-insert
-_omp_create_widget vi-add-next vimode-insert
-_omp_create_widget vi-change vimode-insert
-_omp_create_widget vi-change-eol vimode-insert
-_omp_create_widget vi-change-whole-line vimode-insert
-_omp_create_widget vi-open-line-above vimode-insert
-_omp_create_widget vi-open-line-below vimode-insert
+hook_widget vi-insert vimode-insert
+hook_widget vi-insert-bol vimode-insert
+hook_widget vi-add-eol vimode-insert
+hook_widget vi-add-next vimode-insert
+hook_widget vi-change vimode-insert
+hook_widget vi-change-eol vimode-insert
+hook_widget vi-change-whole-line vimode-insert
+hook_widget vi-open-line-above vimode-insert
+hook_widget vi-open-line-below vimode-insert
 
 
 # Replace mode
-_omp_create_widget vi-replace vimode-replace
-_omp_create_widget vi-replace-chars vimode-replace
+hook_widget vi-replace vimode-replace
+hook_widget vi-replace-chars vimode-replace
 
 # Visual mode
-_omp_create_widget visual-mode vimode-visual
-_omp_create_widget visual-line-mode vimode-visual-line
+hook_widget visual-mode vimode-visual
+hook_widget visual-line-mode vimode-visual-line
 
 
 # reset to default mode at the end of line input reading
 line-finish() {
     export VI_MODE="INSERT"
 }
-_omp_create_widget zle-line-finish line-finish
+hook_widget zle-line-finish line-finish
 
 # Fix a bug when you C-c in CMD mode, you'd be prompted with CMD mode indicator
 # while in fact you would be in INS mode.
