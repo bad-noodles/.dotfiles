@@ -19,7 +19,23 @@ ticket() {
 }
 
 pr() {
-  open "https://github.com/$(repo)/compare/$(branch)?expand=1"
+  case $1 in
+    "key")
+      echo $key
+      ;;
+    "link")
+      echo "https://audibene.atlassian.net/browse/${key}"
+      ;;
+    "open")
+      open "https://audibene.atlassian.net/browse/${key}"
+      ;;
+    "pr")
+      open "https://github.com/$(repo)/compare/$(branch)?expand=1"
+      ;;
+    "gif")
+      gifrec $key
+      ;;
+  esac
 }
 
 #Begin: managed by swing

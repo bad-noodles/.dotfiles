@@ -1,0 +1,9 @@
+version: 1
+current_profile: 111494d0-a6b9-445c-89eb-9be02b5ed3b1:557058:bcd458d4-17af-4f2b-b1e8-ba7d06882d90
+profiles:
+    - site: bad-noodles.atlassian.net
+      cloud_id: 111494d0-a6b9-445c-89eb-9be02b5ed3b1
+      account_id: 557058:bcd458d4-17af-4f2b-b1e8-ba7d06882d90
+      display_name: Rafael Pinheiro
+      email: pinheiro.rbp@gmail.com
+      auth_type: oauth

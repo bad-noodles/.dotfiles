@@ -1,10 +1,13 @@
 spoon.SpoonInstall:andUse("AppLauncher", {
+	config = {
+		modifiers = { "option" },
+	},
 	hotkeys = {
-		d = "Discord",
+		d = "dbeaver",
 		n = "Logseq",
 		t = "WezTerm",
-		w = "Brave Browser",
-		s = "Stremio",
+		b = "Brave Browser",
 		m = "Spotify",
+		s = "Slack",
 	},
 })

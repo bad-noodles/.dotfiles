@@ -1,0 +1,60 @@
+{
+  "parser-directories": [
+    "/Users/rafa/github",
+    "/Users/rafa/src",
+    "/Users/rafa/source",
+    "/Users/rafa/projects",
+    "/Users/rafa/dev",
+    "/Users/rafa/dev/tree-sitter-lss/src",
+    "/Users/rafa/git"
+  ],
+  "theme": {
+    "type.builtin": {
+      "bold": true,
+      "color": 23
+    },
+    "string": 28,
+    "tag": 18,
+    "variable.parameter": {
+      "underline": true
+    },
+    "property": 124,
+    "operator": {
+      "color": 239,
+      "bold": true
+    },
+    "constructor": 136,
+    "number": {
+      "bold": true,
+      "color": 94
+    },
+    "variable.builtin": {
+      "bold": true
+    },
+    "embedded": null,
+    "type": 23,
+    "attribute": {
+      "color": 124,
+      "italic": true
+    },
+    "constant.builtin": {
+      "bold": true,
+      "color": 94
+    },
+    "function": 26,
+    "keyword": 56,
+    "string.special": 30,
+    "comment": {
+      "color": 245,
+      "italic": true
+    },
+    "constant": 94,
+    "module": 136,
+    "punctuation.bracket": 239,
+    "function.builtin": {
+      "bold": true,
+      "color": 26
+    },
+    "punctuation.delimiter": 239
+  }
+}

@@ -6,6 +6,7 @@ ORANGE=208
 BLUE=27
 RED=203
 GREEN=40
+NODE_GREEN=72
 LIGHT_PINK=171
 
 block() {
@@ -52,7 +53,7 @@ git_status() {
   local staged=$(git diff --cached --numstat | wc -l | awk '{print $1}')
   local changes=$(git --no-pager diff --shortstat | cut -c 2)
   local untracked=$(git ls-files --others --exclude-standard | wc -l | awk '{print $1}')
-  local origin=$(cat .git/FETCH_HEAD | egrep -o -m 1 ":.*$" | cut -c 2-)
+  local origin=$(git remote -v | pcregrep -o1  ":([^ ]*)\.git" | head -n 1)
 
   local output=' '
   output+=$origin
@@ -85,26 +86,26 @@ end_line() {
   echo $output
 }
 
-vi_mode() {
-  local color=$COLOR_INSERT
-
-  case $VI_MODE in
-    "NORMAL")
-      color=$COLOR_NORMAL
-      ;;
-    "VISUAL" | "V-LINE")
-      color=$COLOR_VISUAL
-      ;;
-    "REPLACE")
-      color=$COLOR_REPLACE
-      ;;
-  esac
-
-  block $color $VI_MODE
+clock() {
+  block $PINK "󰥔 $(date "+%H:%M:%S")"
 }
 
-clock() {
-  block $PINK " $(date "+%H:%M:%S")"
+nodejs() {
+  if [[ ! -f package.json ]]; then
+    return
+  fi
+  
+  local current_version=$(node --version | sed 's/v//')
+  # local nvmrc_version=$(cat .nvmrc | sed 's/v//' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+  # local status_icon=""
+  # 
+  # if [[ "$current_version" == "$nvmrc_version"* ]]; then
+  #   status_icon=""
+  # else
+  #   status_icon=""  
+  # fi
+  
+  block $NODE_GREEN "󰎙 $current_version"
 }
 
 precmd() {
@@ -112,7 +113,7 @@ precmd() {
   first_block=true
   PROMPT="$(clock)"
   first_block=false
-  PROMPT+="$(user)$(hostname)$(cwd)$(git_status)$(exit_code $last_exit_code)$(end_line)"
+  PROMPT+="$(user)$(hostname)$(cwd)$(nodejs)$(git_status)$(exit_code $last_exit_code)$(end_line)"
   PROMPT+=$'\u000a' #LINE BREAK
   PROMPT+="  "
 }
