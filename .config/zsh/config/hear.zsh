@@ -26,7 +26,7 @@ ticket() {
     "pr")
       open "https://github.com/$(repo)/compare/$(branch)?expand=1"
       ;;
-    "rec")
+    "gif")
       gifrec $key
       ;;
   esac

@@ -3,4 +3,4 @@ __pycache__
 lazy-lock.json
 .config/zgenom
 .config/nvim/lazy-lock.json
-.config/zsh/env.zsh
+.config/zsh/config/env.zsh
