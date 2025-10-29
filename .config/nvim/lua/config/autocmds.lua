@@ -17,3 +17,10 @@ vim.api.nvim_create_autocmd("FileType", {
     })
   end,
 })
+
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  pattern = { "*.md" },
+  callback = function()
+    require('cmp').setup.buffer { enabled = false }
+  end,
+})

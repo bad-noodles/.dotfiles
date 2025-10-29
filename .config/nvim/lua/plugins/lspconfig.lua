@@ -11,6 +11,7 @@ return {
           end
         end,
       },
+      filetypes = { 'bash', 'sh', 'zsh' }
     })
   end,
 }

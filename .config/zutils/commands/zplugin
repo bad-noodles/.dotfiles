@@ -1,0 +1,76 @@
+#!/usr/bin/env lua
+
+local root = os.getenv("ZUTIL_HOME")
+package.path = package.path .. ";" .. root .. "/core/?.lua"
+
+local plugin = require("plugin")
+local list = require("list")
+local generate = require("generator")
+
+local plugin_name = arg[2]
+
+local commands = {}
+
+function commands.install()
+	if plugin_name == nil then
+		plugin.install_all()
+		generate()
+		return
+	end
+
+	local plug = plugin:new(plugin_name)
+	if plug.listed and plug.installed then
+		print("Plugin " .. plugin_name .. ' already installed! Did you mean "update" instead?')
+		return
+	end
+
+	plug:install()
+	generate()
+end
+
+function commands.update()
+	if plugin_name == nil then
+		plugin.update_all()
+		generate()
+		return
+	end
+
+	local plug = plugin:new(plugin_name)
+	if plug.listed and not plug.installed then
+		print("Plugin " .. plugin_name .. ' is listed but not yet installed! Did you mean "install" instead?')
+		return
+	end
+
+	if not plug.listed and not plug.installed then
+		print("Plugin " .. plugin_name .. ' not yet installed! Did you mean "install" instead?')
+		return
+	end
+
+	plug:update()
+	generate()
+end
+
+function commands.auto_update()
+  local updated = plugin.update_all()
+  if #updated == 0 then
+    return
+  end
+
+  generate(updated)
+end
+
+function commands.list()
+	local plugin_list = list:new("plugins")
+	for _, plug in ipairs(plugin_list:values()) do
+		print(plug)
+	end
+end
+
+local cmd = commands[string.gsub(arg[1], "-", "_")]
+
+if not cmd then
+	print('Unknown command "' .. arg[1] .. '"')
+	os.exit(1, true)
+end
+
+cmd()

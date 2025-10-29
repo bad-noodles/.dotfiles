@@ -1,0 +1,8 @@
+#!/usr/bin/env lua
+
+local root = os.getenv("ZUTIL_HOME")
+package.path = package.path .. ";" .. root .. "/core/?.lua"
+
+local generate = require 'generator'
+
+generate()

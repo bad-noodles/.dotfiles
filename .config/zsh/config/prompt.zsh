@@ -16,18 +16,14 @@ block() {
   output=''
 
   if $first_block; then
-    output+=$(tput setaf $color)
-    output+=''  
+    output+="%F{$color}%f"
   else
-    output+=$(tput setab $color)
-    output+=' '
+    output+="%K{$color} %k"
   fi
 
-  output+=$(tput sgr0)
-  output+=$(tput setab $color)
-  output+=$content
-  output+=$(tput sgr0)
-  output+=$(tput setaf $color)
+  output+="%f"
+  output+="%K{$color}$content%k"
+  output+="%F{$color}"
 
   echo -e $output
 }
@@ -45,31 +41,19 @@ cwd() {
 }
 
 git_status() {
-  if [ ! -d ".git" ]; then
+  local branch=$(git --no-pager branch 2>/dev/null | grep "\* .*$" | sed "s/\* //")
+
+  if [ "$branch" = "" ]; then
     return
   fi
-  local branch=$(git --no-pager branch | grep "\* .*$" | sed "s/\* //")
+
   local commits=$(git cherry 2> /dev/null | wc -l | awk '{print $1}')
   local staged=$(git diff --cached --numstat | wc -l | awk '{print $1}')
   local changes=$(git --no-pager diff --shortstat | cut -c 2)
   local untracked=$(git ls-files --others --exclude-standard | wc -l | awk '{print $1}')
   local origin=$(git remote -v | pcregrep -o1  ":([^ ]*)\.git" | head -n 1)
 
-  local output=' '
-  output+=$origin
-  output+='  '
-  output+=$branch
-  output+='  '
-  output+=$commits
-  output+='  '
-  output+=$staged
-  output+='  '
-  output+=$changes
-  output+='  '
-  output+=$untracked
-
-
-  block $BLUE $output
+  block $BLUE " $origin  $branch  $commits  $changes  $untracked"
 }
 
 function exit_code() {
@@ -81,9 +65,7 @@ function exit_code() {
 }
 
 end_line() {
-  output=''
-  output+=$(tput sgr0)
-  echo $output
+  echo "%f"
 }
 
 clock() {
@@ -91,6 +73,7 @@ clock() {
 }
 
 nodejs() {
+  # FIX: This only works at the root directory
   if [[ ! -f package.json ]]; then
     return
   fi

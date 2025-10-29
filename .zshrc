@@ -13,8 +13,10 @@ zstyle ':completion:*' completer _extensions _complete _approximate
 
 eval "$(zoxide init zsh --cmd cd)"
 
-source ~/.config/zsh/plugins.zsh
+#source ~/.config/zsh/plugins.zsh
+source ~/.config/zutils/init.zsh
 
-for f (~/.config/zsh/config/*.zsh(N.))  . $f
+# shellcheck disable=SC1072,SC1073,SC1058
+for f (~/.config/zsh/config/*.zsh(N.)) . $f
 
 # zprof

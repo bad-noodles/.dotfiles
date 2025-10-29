@@ -1,0 +1,23 @@
+Updating zpm-zsh/colors
+Already up to date.
+
+Updating zpm-zsh/colorize
+Updating 56b136a..1f1d49e
+Fast-forward
+ README.md           |  51 +++++++++++++++++++++
+ colorize.plugin.zsh | 128 +++++++++++-----------------------------------------
+ 2 files changed, 77 insertions(+), 102 deletions(-)
+ create mode 100644 README.md
+
+Updating zsh-users/zsh-syntax-highlighting
+Already up to date.
+
+Updating zsh-users/zsh-history-substring-search
+Already up to date.
+
+Updating zsh-users/zsh-autosuggestions
+Already up to date.
+
+Updating MichaelAquilina/zsh-you-should-use
+Already up to date.
+

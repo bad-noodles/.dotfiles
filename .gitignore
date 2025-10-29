@@ -4,3 +4,5 @@ lazy-lock.json
 .config/zgenom
 .config/nvim/lazy-lock.json
 .config/zsh/config/env.zsh
+.config/zutils/.plugins/*
+.config/v-analyzer
