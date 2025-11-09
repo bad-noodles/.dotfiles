@@ -26,12 +26,13 @@ config.use_fancy_tab_bar = false
 
 -- Keybindings
 config.keys = {
-  { key = "LeftArrow", mods = "OPT", action = wezterm.action.SendString("\x1bb") },
-  { key = "RightArrow", mods = "OPT", action = wezterm.action.SendString("\x1bf") },
-  { key = "h", mods = "CMD|SHIFT", action = wezterm.action.ActivateTabRelative(-1) },
-  { key = "l", mods = "CMD|SHIFT", action = wezterm.action.ActivateTabRelative(1) },
-  { key = "|", mods = "CMD|SHIFT", action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-  { key = "-", mods = "CMD|SHIFT", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "LeftArrow", mods = "OPT", action = wezterm.action.SendString("\x1bb") },
+	{ key = "RightArrow", mods = "OPT", action = wezterm.action.SendString("\x1bf") },
+	{ key = "h", mods = "CMD|SHIFT", action = wezterm.action.ActivateTabRelative(-1) },
+	{ key = "l", mods = "CMD|SHIFT", action = wezterm.action.ActivateTabRelative(1) },
+	{ key = "|", mods = "CMD|SHIFT", action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	{ key = "-", mods = "CMD|SHIFT", action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "Z", mods = "CMD|SHIFT", action = wezterm.action.TogglePaneZoomState },
 }
 
 return config

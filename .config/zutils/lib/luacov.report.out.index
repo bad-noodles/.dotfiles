@@ -1,0 +1,11 @@
+zapply.lua:0 327
+zplugin.lua:327 3748
+framework/git.lua:3748 5683
+framework/fs.lua:5683 6267
+framework/list.lua:6267 8231
+framework/output.lua:8231 8812
+framework/input.lua:8812 9638
+core/plugin.lua:9638 12089
+core/plugin_spec.lua:12089 15988
+core/generator.lua:15988 17731
+Summary:17731 18460

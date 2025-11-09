@@ -1,6 +1,8 @@
 ---@diagnostic disable: need-check-nil
+
+local plugin = require("core/plugin")
+
 local function generate(updated_plugins)
-	local plugin = require("plugin")
 
 
   local seven_days = 604800
@@ -17,16 +19,26 @@ local function generate(updated_plugins)
 if [ -z "$ZUTIL_HOME" ]; then
   export ZUTIL_HOME=~/.config/zutils
 fi
-export PATH=$PATH:$ZUTIL_HOME/commands
+export PATH=$PATH:$ZUTIL_HOME/bin
 if [ $(date +%s) -gt ]] .. os.time() + seven_days .. [[ ];
 then
   (zplugin auto-update > $ZUTIL_HOME/.generated/stdout 2> $ZUTIL_HOME/.generated/stderr &)
 fi
 ]])
 
+  local has_uninstalled = false
 	for _, plug in ipairs(plugins) do
-		output:write("source " .. plug:main_file() .. "\n")
+    if plug.installed then
+      output:write("source " .. plug:main_file() .. "\n")
+    else
+      output:write("echo 'Plugin \"" .. plug.repo .. "\" is not installed.'\n")
+      has_uninstalled = true
+    end
 	end
+
+  if has_uninstalled then
+    output:write("echo 'Run \"zplugin install\" to install all missing plugins or \"zplugin uninstall [repo] [path]\" to remove it.'\n")
+  end
 
   if updated_plugins ~= nil and #updated_plugins > 0 then
     output:write("echo \"Updated plugins:\"\n")
@@ -37,6 +49,7 @@ fi
   end
 
 	output:close()
+  os.execute("exec zsh")
 end
 
 return generate

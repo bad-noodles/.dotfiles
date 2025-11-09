@@ -1,0 +1,746 @@
+==============================================================================
+zapply.lua
+==============================================================================
+
+0 local root = os.getenv("ZUTIL_HOME")
+0 package.path = package.path .. ";" .. root .. "/lib/?.lua"
+
+0 require("core/generator")()
+0 os.execute("exec zsh")
+
+==============================================================================
+zplugin.lua
+==============================================================================
+0 local input = require("framework/input")
+0 local output = require("framework/output")
+0 local plugin = require("core/plugin")
+0 local generate = require("core/generator")
+
+  local function repo()
+0 	return input.nth_argument(2)
+  end
+
+  local function get_plugin()
+0 	return plugin:new(repo(), input.nth_argument(3))
+  end
+
+0 local commands = {}
+
+0 function commands.install()
+0 	if repo() == nil then
+0 		plugin.install_all()
+0 		generate()
+0 		return
+  	end
+
+0 	local plug = get_plugin()
+0 	if plug.listed and plug.installed then
+0 		output.exit(
+0 			output.error_codes.AlreadyInstalled,
+0 			"Plugin " .. repo() .. ' already installed! Did you mean "update" instead?'
+  		)
+  	end
+
+0 	plug:install()
+0 	generate()
+  end
+
+0 function commands.update()
+0 	if repo() == nil then
+0 		plugin.update_all()
+0 		generate()
+0 		return
+  	end
+
+0 	local plug = get_plugin()
+0 	if plug.listed and not plug.installed then
+0 		output.exit(
+0 			output.error_codes.ListedButNotInstalled,
+0 			"Plugin " .. repo() .. ' is listed but not yet installed! Did you mean "install" instead?'
+  		)
+  	end
+
+0 	if not plug.listed and not plug.installed then
+0 		output.exit(
+0 			output.error_codes.NotInstalled,
+0 			"Plugin " .. repo() .. ' not yet installed! Did you mean "install" instead?'
+  		)
+  	end
+
+0 	print("Updating \27[1m" .. plug.id .. "\27[0m")
+0 	plug:update()
+0 	generate()
+  end
+
+0 function commands.auto_update()
+0 	local updated = plugin.update_all()
+0 	if #updated == 0 then
+0 		return
+  	end
+
+0 	generate(updated)
+  end
+
+0 function commands.uninstall()
+0 	if repo() == nil then
+0 		commands.help()
+0 		output.exit(output.error_codes.BadUsage, "Please specify what plugin you want to uninstall")
+  	end
+
+0 	local plug = get_plugin()
+
+0 	print("Uninstalling \27[1m" .. plug.id .. "\27[0m")
+0 	plug:uninstall()
+0 	generate()
+  end
+
+0 function commands.list()
+0 	local has_uninstalled = false
+0 	local not_installed_only = input.flag("not-installed")
+0 	local installed_only = input.flag("installed")
+
+0 	for _, plug in ipairs(plugin.list()) do
+0 		if (installed_only and not plug.installed) or (not_installed_only and plug.installed) then
+  			goto continue
+  		end
+
+0 		if plug.installed then
+0 			print(plug.repo)
+  		else
+0 			has_uninstalled = true
+0 			print(plug.repo, "(not installed)")
+  		end
+  		::continue::
+  	end
+
+0 	if has_uninstalled then
+0 		print("\nRun `zplugin install` to install all missing plugins")
+  	end
+  end
+
+0 function commands.help()
+0 	output.print([[
+  Usage: zplugin install [repo] [path]
+         zplugin uninstall [repo] [path]
+         zplugin list [list-options]
+         zplugin help
+
+  repo:
+    Full http git repository path or github "username/repository".
+    If not provided on install, it will install all listed but uninstalled plugins.
+
+  path:
+    For plugins that do not reside on the root of the repository.
+
+  list-options:
+    --installed       Lists installed plugins only
+    --not-installed   Lists plugins that are listed for installation but not checked out yet
+0   ]])
+  end
+
+0 local cmd = commands[string.gsub(input.nth_argument(1), "-", "_")]
+
+0 if not cmd then
+0 	commands.help()
+0 	output.exit(output.error_codes.BadUsage, 'Unknown command "' .. input.nth_argument(1) .. '"')
+  end
+
+0 cmd()
+
+==============================================================================
+framework/git.lua
+==============================================================================
+  ---@diagnostic disable: need-check-nil
+
+* local plugin_folder = os.getenv("ZUTIL_HOME") .. "/.plugins/"
+
+* local git = {}
+
+  -- Adapters
+* local regular = {}
+* local sparse = {}
+
+* function regular.clone(repo)
+0 	local url = git.resolve(repo)
+0 	os.execute("git clone " .. url .. " " .. plugin_folder .. repo)
+  end
+
+* function regular.pull(repo)
+0 	local handle = io.popen("git -C " .. plugin_folder .. repo .. " pull")
+0 	local out = handle:read("*a")
+0 	handle:close()
+
+0 	return out
+  end
+
+* function sparse.clone(repo, path)
+0 	local url = git.resolve(repo)
+0 	local handle = io.popen("git clone --depth=1 --filter=tree:0 --no-checkout " .. url .. " " .. plugin_folder .. repo)
+0 	local out = handle:read("*a")
+0 	handle:close()
+    
+
+0 	handle = io.popen("git -C " .. plugin_folder .. repo .. " sparse-checkout init")
+0 	out = out .. "\n" .. handle:read("*a")
+0 	handle:close()
+
+0 	handle = io.popen("git -C " .. plugin_folder .. repo .. " sparse-checkout set " .. path)
+0 	out = out .. "\n" .. handle:read("*a")
+0 	handle:close()
+
+0 	handle = io.popen("git -C " .. plugin_folder .. repo .. " checkout")
+0 	out = out .. "\n" .. handle:read("*a")
+0 	handle:close()
+
+0 	return out
+  end
+
+* function git.is_sparse(repo)
+0 	local handle = io.popen("git -C " .. plugin_folder .. repo .. " sparse-checkout list")
+0 	local out = handle:read("*a")
+
+0 	handle:close()
+
+0 	return out ~= "fatal: this worktree is not sparse"
+  end
+
+* function git.resolve(repo)
+  	-- TODO: Other sources
+0 	return "https://github.com/" .. repo
+  end
+
+* function git.download(repo, path)
+0 	print(path)
+0 	if not path then
+0 		return regular.clone(repo)
+  	end
+
+0 	return sparse.clone(repo, path)
+  end
+
+* function git.pull(repo)
+0 	return regular.pull(repo)
+  end
+
+* return git
+
+==============================================================================
+framework/fs.lua
+==============================================================================
+* local FS = {}
+
+* function FS.exists(path)
+* 	local ok, err, code = os.rename(path, path)
+* 	if not ok then
+* 		if code == 13 then
+  			-- Permission denied, but it exists
+0 			return true
+  		end
+  	end
+* 	return ok, err
+  end
+
+* function FS.delete_dir(path)
+  	-- FIX: Delete parent plugin folder if empty, possibly recursive because of sparse checkout
+* 	os.execute("rm -Rf " .. path)
+  end
+
+* return FS
+
+==============================================================================
+framework/list.lua
+==============================================================================
+* local output = require("framework/output")
+
+* local List = {}
+
+* local root = os.getenv("ZUTIL_HOME")
+
+* function List:new(path)
+0   local list = {
+0     path = root .. "/" .. path
+    }
+0   setmetatable(list, self)
+0   self.__index = self
+0   return list
+  end
+
+* function List:add(value)
+0   if self:exists(value) then
+0     return
+    end
+
+0   local file, err = io.open(self.path, "a+")
+0   if not file then
+0     output.exit(output.error_codes.FailedToReadFile, err)
+0     return
+    end
+0   file:write(value, "\n")
+0   file:close()
+  end
+
+* function List:exists(value)
+0   local file, err = io.open(self.path, "r")
+0   if not file then
+0     output.exit(output.error_codes.FailedToReadFile, err)
+0     return
+    end
+
+0   for line in file:lines() do
+0     if line == value then
+0       file:close()
+0       return true
+      end
+    end
+
+0   file:close()
+0   return false
+  end
+
+* function List:remove(value)
+0   local file, err = io.open(self.path, "r")
+0   if not file then
+0     output.exit(output.error_codes.FailedToReadFile, err)
+0     return
+    end
+
+0   local lines = {}
+0   for line in file:lines() do
+0     if line ~= value then
+0       table.insert(lines, line)
+      end
+    end
+
+0   file, err = io.open(self.path, "w")
+0   if not file then
+0     output.exit(output.error_codes.FailedToReadFile, err)
+0     return
+    end
+0   for _, line in ipairs(lines) do
+0     file:write(line .. '\n')
+    end
+
+0   file:close()
+0   return false
+  end
+
+* function List:values()
+0   local file, err = io.open(self.path, "r")
+0   if not file then
+0     output.exit(output.error_codes.FailedToReadFile, err)
+0     return
+    end
+
+0   local values = {}
+
+0   for line in file:lines() do
+0     table.insert(values, line)
+    end
+
+0   file:close()
+
+0   return values
+  end
+
+* return List
+
+==============================================================================
+framework/output.lua
+==============================================================================
+* local Output = {}
+
+* function Output.print(msg)
+0   print(msg)
+  end
+
+* function Output.print_human(msg)
+0   print(msg)
+  end
+
+* function Output.exit(code, message)
+0   io.stderr:write(message .. "\n")
+0   os.exit(code)
+  end
+
+* Output["error_codes"] = {
+*   BadUsage = 1,
+*   FailedToReadFile = 2,
+*   AlreadyInstalled = 3,
+*   NotInstalled = 4,
+*   ListedButNotInstalled = 5,
+* }
+
+* return Output
+
+==============================================================================
+framework/input.lua
+==============================================================================
+0 local Input = {}
+
+0 local arguments = {}
+0 local argument_names = {}
+
+0 for _, a in ipairs(arg) do
+0 	local key, value = a:match("^%-%-([^=]+)=(.+)$")
+0 	if key and value then
+0 		arguments[key] = value
+0     argument_names[key] = true
+0 	elseif a:sub(1, 2) == "--" then
+0 		arguments[a:sub(3)] = true
+  	else
+0 		table.insert(arguments, a)
+  	end
+  end
+
+0 function Input.flag(name)
+0   return arguments[name] == true
+  end
+
+0 function Input.named_argument(name)
+0   if not argument_names[name] then
+0     return false
+    end
+
+0   return arguments[name]
+  end
+
+0 function Input.nth_argument(pos)
+0   return arguments[pos]
+  end
+
+0 return Input
+
+==============================================================================
+core/plugin.lua
+==============================================================================
+* local list = require("framework/list")
+* local git = require("framework/git")
+* local fs = require("framework/fs")
+
+* local plugin_folder = os.getenv("ZUTIL_HOME") .. "/.plugins/"
+* local plugin_list = list:new("plugins")
+
+* local Plugin = {}
+
+  local function full_path(repo, path)
+* 	local p = plugin_folder .. repo .. "/"
+* 	if path then
+0 		p = p .. "/" .. path .. "/"
+  	end
+
+* 	return p
+  end
+
+* function Plugin.is_listed(id)
+* 	return plugin_list:exists(id)
+  end
+
+* function Plugin.is_installed(repo, path)
+*   local _, err = fs.exists(full_path(repo, path))
+*   return err == nil
+  end
+
+* function Plugin.list()
+* 	local plugins = {}
+
+* 	for _, plugin_name in ipairs(plugin_list:values()) do
+* 		table.insert(plugins, Plugin:new(plugin_name))
+  	end
+
+* 	return plugins
+  end
+
+* function Plugin.update_all()
+0 	local plugins = Plugin.list()
+0 	local updated = {}
+
+0 	for _, plug in ipairs(plugins) do
+0 		local had_updates = plug:update()
+0 		if had_updates then
+0 			table.insert(updated, plug.repo)
+  		end
+  	end
+
+0 	return updated
+  end
+
+* function Plugin:main_file()
+0 	local path = full_path(self.repo, self.path)
+  	-- FIX: take care of popen in framework level
+0 	local files = io.popen("ls -pa " .. path .. " | grep .plugin.zsh"):lines()
+0 	for f in files do
+0 		return path .. "/" .. f
+  	end
+  end
+
+* function Plugin:install()
+* 	plugin_list:add(self.id)
+
+* 	if Plugin.is_installed(self.id) then
+* 		return false
+  	end
+
+* 	git.download(self.repo, self.path)
+*   return true
+  end
+
+* function Plugin.install_all()
+0 	local plugins = Plugin.list()
+
+0 	for _, plug in ipairs(plugins) do
+0 		plug:install()
+  	end
+  end
+
+* function Plugin:update()
+* 	plugin_list:add(self.id)
+* 	local out = git.pull(full_path(self.repo, self.path))
+
+* 	return out ~= "Already up to date.\n", out
+  end
+
+* function Plugin:uninstall()
+* 	plugin_list:remove(self.id)
+* 	fs.delete_dir(full_path(self.repo, self.path))
+  end
+
+* function Plugin:new(repo, path)
+* 	local id = repo
+* 	if path then
+0 		id = id .. ":" .. path
+  	end
+
+* 	local plugin = {
+* 		id = id,
+* 		repo = repo,
+* 		path = path,
+* 		listed = Plugin.is_listed(id),
+* 		installed = Plugin.is_installed(repo, path),
+  	}
+* 	setmetatable(plugin, self)
+* 	self.__index = self
+* 	return plugin
+  end
+
+* return Plugin
+
+==============================================================================
+core/plugin_spec.lua
+==============================================================================
+  ---@diagnostic disable: undefined-field, undefined-global
+
+* describe("Plugin", function()
+  	local plugin
+  	local fake_home
+  	local git
+  	local list
+
+* 	setup(function()
+* 		fake_home = os.tmpname()
+
+* 		os.remove(fake_home)
+* 		os.execute("mkdir " .. fake_home)
+* 		os.execute("mkdir " .. fake_home .. "/.plugins")
+* 		os.execute("mkdir " .. fake_home .. "/.generated")
+* 		os.execute("touch " .. fake_home .. "/plugins")
+
+  		---@diagnostic disable-next-line: duplicate-set-field
+* 		os.getenv = function()
+* 			return fake_home
+  		end
+
+* 		git = mock(require("framework/git"), true)
+
+* 		git.download = spy.new(function(repo, path)
+* 			local p = fake_home .. "/.plugins/" .. repo .. "/"
+* 			if path then
+0 				p = p .. "/" .. path .. "/"
+  			end
+
+* 			os.execute("mkdir -p " .. p)
+  		end)
+
+* 		package.loaded["framework/git"] = git
+
+* 		list = mock(require("framework/list"), true)
+
+* 		list.exists = spy.new(function(_, id)
+* 			return id == "Existing/Plugin"
+  		end)
+
+* 		list.new = spy.new(function()
+* 			return list
+  		end)
+
+* 		package.loaded["framework/list"] = list
+
+* 		plugin = require("core/plugin")
+  	end)
+
+* 	teardown(function()
+* 		os.execute("rm -rf " .. fake_home)
+  	end)
+
+* 	before_each(function()
+* 		list.add:clear()
+* 		git.download:clear()
+  	end)
+
+* 	describe("install", function()
+* 		it("installs a plugin", function()
+* 			local plug = plugin:new("Existing/Plugin")
+* 			assert.True(plug:install())
+
+* 			assert.stub(list.add).was.called_with(list, "Existing/Plugin")
+* 			assert.spy(git.download).was.called_with("Existing/Plugin", nil)
+  		end)
+
+* 		it("fails to install a plugin if it is already installed", function()
+* 			local plug = plugin:new("Existing/Plugin")
+
+* 			assert.False(plug:install())
+* 			assert.stub(list.add).was.called_with(list, "Existing/Plugin")
+* 			assert.spy(git.download).was.not_called()
+  		end)
+  	end)
+
+* 	describe("is_listed", function()
+* 		it("returns false for a plugin that is not listed", function()
+* 			assert.False(plugin.is_listed("NonExisting/Plugin"))
+  		end)
+
+* 		it("returns true for a plugin that is listed", function()
+* 			assert.True(plugin.is_listed("Existing/Plugin"))
+  		end)
+  	end)
+
+* 	describe("is_installed", function()
+* 		it("returns false for a plugin that is not installed", function()
+* 			assert.False(plugin.is_installed("NonExisting/Plugin"))
+  		end)
+
+* 		it("returns true for a plugin that is installed", function()
+* 			assert.True(plugin.is_installed("Existing/Plugin"))
+  		end)
+  	end)
+
+* 	describe("update", function()
+* 		it("returns true if a plugin had updates", function()
+* 			git.pull = spy.new(function()
+* 				return "Updated\n"
+  			end)
+* 			local plug = plugin:new("Existing/Plugin")
+* 			assert.True(plug:update())
+  		end)
+
+* 		it("returns false if a plugin had no updates", function()
+* 			git.pull = spy.new(function()
+* 				return "Already up to date.\n"
+  			end)
+* 			local plug = plugin:new("Existing/Plugin")
+* 			assert.False(plug:update())
+  		end)
+  	end)
+
+* 	describe("list", function()
+* 		it("returns an empty list if there are no plugins", function()
+* 			list.values = spy.new(function()
+* 				return {}
+  			end)
+* 			assert.True(#plugin.list() == 0)
+  		end)
+* 		it("returns a list of plugins if there are plugins", function()
+* 			list.values = spy.new(function()
+* 				return { "Existing/Plugin" }
+  			end)
+* 			assert.True(#plugin.list() == 1)
+  		end)
+  	end)
+
+* 	describe("uninstall", function()
+* 		it("uninstalls a plugin", function()
+* 			local plug = plugin:new("Existing/Plugin")
+* 			plug:uninstall()
+* 			assert.stub(list.remove).was.called_with(list, "Existing/Plugin")
+*       assert.False(plugin.is_installed("Existing/Plugin"))
+  		end)
+  	end)
+  end)
+
+==============================================================================
+core/generator.lua
+==============================================================================
+  ---@diagnostic disable: need-check-nil
+
+0 local plugin = require("core/plugin")
+
+  local function generate(updated_plugins)
+
+
+0   local seven_days = 604800
+
+0 	local generated_folder = os.getenv("ZUTIL_HOME") .. "/.generated/"
+0 	local file_path = generated_folder .. "init.zsh"
+0 	os.execute("touch " .. file_path)
+0 	os.execute("chmod 777 " .. file_path)
+
+0 	local plugins = plugin.list()
+0 	local output = io.open(file_path, "w")
+
+0   output:write([[
+  if [ -z "$ZUTIL_HOME" ]; then
+    export ZUTIL_HOME=~/.config/zutils
+  fi
+  export PATH=$PATH:$ZUTIL_HOME/bin
+0 if [ $(date +%s) -gt ]] .. os.time() + seven_days .. [[ ];
+  then
+    (zplugin auto-update > $ZUTIL_HOME/.generated/stdout 2> $ZUTIL_HOME/.generated/stderr &)
+  fi
+0 ]])
+
+0   local has_uninstalled = false
+0 	for _, plug in ipairs(plugins) do
+0     if plug.installed then
+0       output:write("source " .. plug:main_file() .. "\n")
+      else
+0       output:write("echo 'Plugin \"" .. plug.repo .. "\" is not installed.'\n")
+0       has_uninstalled = true
+      end
+  	end
+
+0   if has_uninstalled then
+0     output:write("echo 'Run \"zplugin install\" to install all missing plugins or \"zplugin uninstall [repo] [path]\" to remove it.'\n")
+    end
+
+0   if updated_plugins ~= nil and #updated_plugins > 0 then
+0     output:write("echo \"Updated plugins:\"\n")
+0     for _, plugin_name in ipairs(updated_plugins) do
+0       output:write("echo \"- " .. plugin_name .. "\"\n")
+      end
+0     output:write("(zapply &)")
+    end
+
+0 	output:close()
+0   os.execute("exec zsh")
+  end
+
+0 return generate
+
+==============================================================================
+Summary
+==============================================================================
+
+File                 Hits Missed Coverage
+-----------------------------------------
+zapply.lua           0    4      0.00%
+framework/input.lua  0    20     0.00%
+core/generator.lua   0    27     0.00%
+zplugin.lua          0    69     0.00%
+framework/list.lua   9    48     15.79%
+framework/git.lua    12   30     28.57%
+framework/output.lua 12   4      75.00%
+core/plugin.lua      48   16     75.00%
+framework/fs.lua     9    1      90.00%
+core/plugin_spec.lua 75   1      98.68%
+-----------------------------------------
+Total                165  220    42.86%

@@ -1,3 +1,5 @@
+local output = require("framework/output")
+
 local List = {}
 
 local root = os.getenv("ZUTIL_HOME")
@@ -18,8 +20,8 @@ function List:add(value)
 
   local file, err = io.open(self.path, "a+")
   if not file then
-    print("Error opening file:", err)
-    os.exit(2, true)
+    output.exit(output.error_codes.FailedToReadFile, err)
+    return
   end
   file:write(value, "\n")
   file:close()
@@ -28,8 +30,8 @@ end
 function List:exists(value)
   local file, err = io.open(self.path, "r")
   if not file then
-    print("Error opening file:", err)
-    os.exit(2, true)
+    output.exit(output.error_codes.FailedToReadFile, err)
+    return
   end
 
   for line in file:lines() do
@@ -43,11 +45,38 @@ function List:exists(value)
   return false
 end
 
+function List:remove(value)
+  local file, err = io.open(self.path, "r")
+  if not file then
+    output.exit(output.error_codes.FailedToReadFile, err)
+    return
+  end
+
+  local lines = {}
+  for line in file:lines() do
+    if line ~= value then
+      table.insert(lines, line)
+    end
+  end
+
+  file, err = io.open(self.path, "w")
+  if not file then
+    output.exit(output.error_codes.FailedToReadFile, err)
+    return
+  end
+  for _, line in ipairs(lines) do
+    file:write(line .. '\n')
+  end
+
+  file:close()
+  return false
+end
+
 function List:values()
   local file, err = io.open(self.path, "r")
   if not file then
-    print("Error opening file:", err)
-    os.exit(2, true)
+    output.exit(output.error_codes.FailedToReadFile, err)
+    return
   end
 
   local values = {}

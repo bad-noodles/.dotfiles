@@ -1,0 +1,6 @@
+#!/usr/bin/env lua
+
+local root = os.getenv("ZUTIL_HOME")
+package.path = package.path .. ";" .. root .. "/lib/?.lua"
+
+require('zapply')
